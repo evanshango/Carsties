@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctionService", "src\AuctionService\AuctionService.csproj", "{B528C6AC-5C4B-4EFB-ADB4-7E6F7B1D50BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchService", "src\SearchService\SearchService.csproj", "{FB8C6E4E-3F0F-4CDC-BAD7-708E5A1AD11D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{B528C6AC-5C4B-4EFB-ADB4-7E6F7B1D50BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B528C6AC-5C4B-4EFB-ADB4-7E6F7B1D50BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B528C6AC-5C4B-4EFB-ADB4-7E6F7B1D50BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB8C6E4E-3F0F-4CDC-BAD7-708E5A1AD11D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB8C6E4E-3F0F-4CDC-BAD7-708E5A1AD11D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB8C6E4E-3F0F-4CDC-BAD7-708E5A1AD11D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB8C6E4E-3F0F-4CDC-BAD7-708E5A1AD11D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

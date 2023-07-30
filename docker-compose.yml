@@ -9,5 +9,17 @@ services:
       - 5434:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
+  mongo-carsties:
+    image: mongo
+    container_name: search_db
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=mongo_pw
+    ports:
+      - 27018:27017
+    volumes:
+      - mongodata:/var/lib/mongodb/data
 volumes: 
   pgdata:
+  mongodata:
