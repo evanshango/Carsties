@@ -1,0 +1,53 @@
+@page
+@model IdentityService.Pages.Account.Register.Index
+
+<div>
+    <partial name="_ValidationSummary"/>
+    <div class="row">
+        <div class="col-8 offset-3">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Register for a Carsties Account</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-page="/Account/Register/Index">
+                        <input type="hidden" asp-for="Input.ReturnUrl"/>
+
+                        <div class="form-group">
+                            <label asp-for="Input.Username"></label>
+                            <input class="form-control" placeholder="Username" asp-for="Input.Username" autofocus>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.Email"></label>
+                            <input class="form-control" placeholder="Email" asp-for="Input.Email" type="email">
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.FullName"></label>
+                            <input class="form-control" placeholder="Full Name" asp-for="Input.FullName">
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Input.Password"></label>
+                            <input type="password" class="form-control" placeholder="Password" asp-for="Input.Password" autocomplete="off">
+                        </div>
+
+                        <div class="p-3 d-flex w-100">
+                            <a class="m-auto" asp-page="../Login/Index" asp-route-returnUrl="@Model.Input.ReturnUrl">
+                                Already Registered? Login Here.
+                            </a>
+                        </div>
+
+                        <div class="row ml-3 mr-3">
+                            <button class="btn btn-primary col-sm mr-md-2" name="Input.Button" value="register">Register</button>
+                            <button class="btn btn-secondary col-sm ml-md-2" name="Input.Button" value="cancel">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                @if (Model.RegisterSuccess) {
+                    <div class="alert alert-success mt-2">
+                        <strong>Successfully registered</strong> - You can now login
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
