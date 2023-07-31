@@ -1,4 +1,3 @@
-using Contracts;
 using MassTransit;
 using SearchService.Consumers;
 using SearchService.Data;
@@ -11,13 +10,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddMassTransit(x => {
-    // x.AddConsumersFromNamespaceContaining<AuctionCreatedConsumer>();
     x.AddConsumer<AuctionCreatedConsumer>();
     x.AddConsumer<AuctionUpdatedConsumer>();
     x.AddConsumer<AuctionDeletedConsumer>();
-    
+
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
-    
+
     x.UsingRabbitMq((ctx, cfg) => {
         cfg.Host(builder.Configuration["RabbitMQ:Host"], h => {
                 h.Username(builder.Configuration["RabbitMQ:Username"]);
