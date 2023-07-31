@@ -19,7 +19,11 @@ builder.Services.AddMassTransit(x => {
         opt.UsePostgres();
         opt.UseBusOutbox();
     });
+    
     x.AddConsumer<AuctionCreatedFaultConsumer>();
+    x.AddConsumer<AuctionFinishedConsumer>();
+    x.AddConsumer<BidPlacedConsumer>();
+    
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auction", false));
     x.UsingRabbitMq((ctx, cfg) => {
         cfg.Host(builder.Configuration["RabbitMQ:Host"], h => {
@@ -31,13 +35,12 @@ builder.Services.AddMassTransit(x => {
     });
 });
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(opt => {
-        opt.Authority = builder.Configuration["IdentityServiceUrl"];
-        opt.RequireHttpsMetadata = false;
-        opt.TokenValidationParameters.ValidateAudience = false;
-        opt.TokenValidationParameters.NameClaimType = "username";
-    });
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt => {
+    opt.Authority = builder.Configuration["IdentityServiceUrl"];
+    opt.RequireHttpsMetadata = false;
+    opt.TokenValidationParameters.ValidateAudience = false;
+    opt.TokenValidationParameters.NameClaimType = "username";
+});
 
 var app = builder.Build();
 
