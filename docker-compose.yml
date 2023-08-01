@@ -2,7 +2,6 @@ services:
   postgres-carsties:
     image: postgres:14-alpine
     container_name: auction_db
-    restart: always
     environment:
       - POSTGRES_PASSWORD=Dev@Null
     ports:
@@ -12,7 +11,6 @@ services:
   mongo-carsties:
     image: mongo
     container_name: search_db
-    restart: always
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=mongo_pw
@@ -23,13 +21,74 @@ services:
   rabbitmq-carsties:
     image: rabbitmq:management-alpine
     container_name: rabbitmq
-    restart: always
     ports:
       - "5673:5672"
       - "15673:15672"
     volumes:
       - rabbitdata:/var/lib/rabbitmq
-volumes: 
+  auction-svc:
+    image: evanshango/auction-svc:latest
+    container_name: auction-svc
+    build:
+      context: .
+      dockerfile: src/AuctionService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - RabbitMQ__Host=rabbitmq-carsties
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+      - ConnectionStrings__DefaultConnection=Server=postgres-carsties;User Id=postgres;Password=Dev@Null;Database=auction_db
+      - IdentityServiceUrl=http://identity-svc
+    ports:
+      - 7001:80
+    depends_on:
+      - postgres-carsties
+      - rabbitmq-carsties
+  search-svc:
+    image: evanshango/search-svc:latest
+    container_name: search-svc
+    build:
+      context: .
+      dockerfile: src/SearchService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - RabbitMQ__Host=rabbitmq-carsties
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+      - ConnectionStrings__MongoDbConnection=mongodb://root:mongo_pw@mongo-carsties
+    ports:
+      - 7002:80
+    depends_on:
+      - mongo-carsties
+      - rabbitmq-carsties
+  identity-svc:
+    image: evanshango/identity-svc:latest
+    container_name: identity-svc
+    build:
+      context: .
+      dockerfile: src/IdentityService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=postgres-carsties;User Id=postgres;Password=Dev@Null;Database=identity_db
+    ports:
+      - 5001:80
+    depends_on:
+      - postgres-carsties
+  gateway-svc:
+    image: evanshango/gateway-svc:latest
+    container_name: gateway-svc
+    build:
+      context: .
+      dockerfile: src/GatewayService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:80
+    ports:
+      - 6001:80
+volumes:
   pgdata:
   mongodata:
   rabbitdata:
