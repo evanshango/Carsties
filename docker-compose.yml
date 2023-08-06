@@ -103,6 +103,22 @@ services:
     depends_on: 
       - mongo-carsties
       - rabbitmq-carsties
+  notification-svc:
+    image: evanshango/notification-svc:latest
+    container_name: notification-svc
+    build:
+      context: .
+      dockerfile: src/NotificationService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - RabbitMQ__Host=rabbitmq-carsties
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+    ports:
+      - 7004:80
+    depends_on:
+      - rabbitmq-carsties
   gateway-svc:
     image: evanshango/gateway-svc:latest
     container_name: gateway-svc
