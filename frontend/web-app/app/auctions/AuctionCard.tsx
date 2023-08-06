@@ -2,6 +2,7 @@ import {FC} from "react";
 import CountDownTimer from "@/app/auctions/CountDownTimer";
 import CarImage from "@/app/auctions/CarImage";
 import {Auction} from "@/types";
+import Link from "next/link";
 
 type Props = {
     auction: Auction
@@ -9,7 +10,7 @@ type Props = {
 
 const AuctionCard: FC<Props> = ({auction}: Props) => {
     return (
-        <a href={'#'} className='group'>
+        <Link href={`/auctions/details/${auction.id}`} className='group'>
             <div className="w-full bg-gray-200 aspect-w-16 aspect-h-10 rounded-lg overflow-hidden border-2">
                 <div>
                     <CarImage imageUrl={auction.imageUrl} make={auction.make}/>
@@ -26,7 +27,7 @@ const AuctionCard: FC<Props> = ({auction}: Props) => {
                     {auction.year}
                 </p>
             </div>
-        </a>
+        </Link>
     )
 }
 
