@@ -1,31 +1,20 @@
-using AuctionService.Consumers;
-using AuctionService.Data;
-using AuctionService.RequestHelpers;
-using AuctionService.Services;
+using BiddingService.Consumers;
+using BiddingService.RequestHelpers;
+using BiddingService.Services;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
+using MongoDB.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddDbContext<AuctionDbContext>(opt => {
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 builder.Services.AddMassTransit(x => {
-    x.AddEntityFrameworkOutbox<AuctionDbContext>(opt => {
-        opt.QueryDelay = TimeSpan.FromSeconds(10);
-        opt.UsePostgres();
-        opt.UseBusOutbox();
-    });
+    x.AddConsumer<AuctionCreatedConsumer>();
 
-    x.AddConsumer<AuctionCreatedFaultConsumer>();
-    x.AddConsumer<AuctionFinishedConsumer>();
-    x.AddConsumer<BidPlacedConsumer>();
-
-    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auction", false));
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("bidding", false));
     x.UsingRabbitMq((ctx, cfg) => {
         cfg.Host(builder.Configuration["RabbitMQ:Host"], "/", h => {
                 h.Username(builder.Configuration.GetValue("RabbitMQ:Username", "guest"));
@@ -43,7 +32,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     opt.TokenValidationParameters.NameClaimType = "username";
 });
 
-builder.Services.AddGrpc();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddHostedService<CheckAuctionFinished>();
+builder.Services.AddScoped<GrpcAuctionClient>();
 
 var app = builder.Build();
 
@@ -52,12 +43,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapGrpcService<GrpcAuctionService>();
 
-try {
-    DbInitializer.InitDb(app);
-} catch (Exception e) {
-    Console.WriteLine(e);
-}
+await DB.InitAsync("bidding_db", MongoClientSettings.FromConnectionString(
+        builder.Configuration.GetConnectionString("MongoDbConnection")
+    )
+);
+
 
 app.Run();

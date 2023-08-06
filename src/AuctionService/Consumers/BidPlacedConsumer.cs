@@ -13,13 +13,19 @@ public class BidPlacedConsumer : IConsumer<BidPlaced> {
 
     public async Task Consume(ConsumeContext<BidPlaced> context) {
         Console.WriteLine("--> Consuming BidPlaced");
-        var auction = await _context.Auctions.FindAsync(context.Message.AuctionId);
+        var auction = await _context.Auctions.FindAsync(
+            Guid.Parse(context.Message.AuctionId ?? throw new ArgumentException(
+                "Unable to parse string to Guid")
+            )
+        );
 
         if (auction is null) return;
 
         var bid = auction.CurrentHighBid;
 
-        if (bid is null || context.Message.BidStatus!.Contains("Accepted") && context.Message.Amount > bid) {
+        if (bid is null || context.Message.BidStatus!.Contains("ACCEPTED", StringComparison.CurrentCultureIgnoreCase)
+            && context.Message.Amount > bid
+           ) {
             auction.CurrentHighBid = context.Message.Amount;
             await _context.SaveChangesAsync();
         }

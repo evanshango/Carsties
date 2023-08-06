@@ -22,8 +22,8 @@ services:
     image: rabbitmq:management-alpine
     container_name: rabbitmq
     ports:
-      - "5673:5672"
-      - "15673:15672"
+      - "5672:5672"
+      - "15672:15672"
     volumes:
       - rabbitdata:/var/lib/rabbitmq
   auction-svc:
@@ -35,13 +35,19 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_URLS=http://+:7777
       - RabbitMQ__Host=rabbitmq-carsties
       - RabbitMQ__Username=guest
       - RabbitMQ__Password=guest
       - ConnectionStrings__DefaultConnection=Server=postgres-carsties;User Id=postgres;Password=Dev@Null;Database=auction_db
       - IdentityServiceUrl=http://identity-svc
+      - Kestrel__Endpoints__Grpc__Protocols=Http2
+      - Kestrel__Endpoints__Grpc__Url=http://+:7777
+      - Kestrel__Endpoints__WebApi__Protocols=Http1
+      - Kestrel__Endpoints__WebApi__Url=http://+:80
     ports:
       - 7001:80
+      - 7777:7777
     depends_on:
       - postgres-carsties
       - rabbitmq-carsties
@@ -77,6 +83,26 @@ services:
       - 5001:80
     depends_on:
       - postgres-carsties
+  bidding-svc:
+    image: evanshango/bidding-svc:latest
+    container_name: bidding-svc
+    build:
+      context: .
+      dockerfile: src/BiddingService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - RabbitMQ__Host=rabbitmq-carsties
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+      - ConnectionStrings__MongoDbConnection=mongodb://root:mongo_pw@mongo-carsties
+      - IdentityServiceUrl=http://identity-svc
+      - GrpcAuctionAddress=http://auction-svc:7777
+    ports:
+      - 7003:80
+    depends_on: 
+      - mongo-carsties
+      - rabbitmq-carsties
   gateway-svc:
     image: evanshango/gateway-svc:latest
     container_name: gateway-svc
