@@ -11,7 +11,7 @@ const AuthTest: FC = () => {
     const update = () => {
         setResult(undefined)
         setLoading(true)
-        updateAuction()
+        updateAuction({}, '123')
             .then(res => setResult(res))
             .finally(() => setLoading(false))
     }

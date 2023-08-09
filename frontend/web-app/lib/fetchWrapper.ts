@@ -55,14 +55,19 @@ const fetchHeaders = async (): Promise<any> => {
 
 const handleResponse = async (response: Response): Promise<any> => {
     const text: string = await response.text()
-    const data = text && JSON.parse(text)
+    let data
+    try {
+        data = JSON.parse(text)
+    } catch (err) {
+        data = text
+    }
 
     if (response.ok) {
         return data || response.statusText
     } else {
         const error = {
             status: response.status,
-            message: response.statusText
+            message: typeof data === 'string' ? data : response.statusText
         }
         return {error}
     }
