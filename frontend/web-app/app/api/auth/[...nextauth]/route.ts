@@ -3,6 +3,7 @@ import DuendeIdentityServer6 from "next-auth/providers/duende-identity-server6";
 import {JWT} from "next-auth/jwt";
 
 export const authOptions: NextAuthOptions = {
+    secret: process.env.NEXTAUTH_SECRET,
     session: {
         strategy: 'jwt'
     },
@@ -11,7 +12,7 @@ export const authOptions: NextAuthOptions = {
             id: 'id-server',
             clientId: 'nextApp',
             clientSecret: 'super_secure_secret',
-            issuer: 'http://localhost:5001',
+            issuer: process.env.ID_SERVER_URL,
             authorization: {params: {scope: 'openid profile auctionApp'}},
             idToken: true
         })

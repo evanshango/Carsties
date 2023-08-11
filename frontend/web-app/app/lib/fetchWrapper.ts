@@ -2,7 +2,7 @@ import {fetch, Response} from "next/dist/compiled/@edge-runtime/primitives";
 import {fetchToken} from "@/app/actions/authActions";
 import {JWT} from "next-auth/jwt";
 
-const baseUrl: string = 'http://localhost:6001/'
+const baseUrl = process.env.API_URL
 
 const GET = async (url: string): Promise<any> => {
     const requestOptions = {
@@ -48,7 +48,9 @@ const DELETE = async (url: string): Promise<any> => {
 
 const fetchHeaders = async (): Promise<any> => {
     const token: JWT | null = await fetchToken()
-    const headers = {'Content-type': 'application/json'} as any
+    const headers = {
+        'Content-type': 'application/json'
+    } as any
     if (token) headers.Authorization = `Bearer ${token?.access_token}`
     return headers
 }
